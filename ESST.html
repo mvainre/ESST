@@ -1,4 +1,4 @@
-// Coded and designed by Tierney Lee, Becky Gilbert, Maris Vainre, and Marc Bennet
+<!---Coded and designed by Tierney Lee, Becky Gilbert, Maris Vainre, and Marc Bennet, 2021--->
 <!DOCTYPE html>
 <html>
     <head>
@@ -11,18 +11,18 @@
         <script src = "block_trials/block2_info.js"></script>
         <script src = "block_trials/block3_info.js"></script>
         <script src = "block_trials/practice_info.js"></script>
-        <link href="jspsych-6.1.0/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+        <link href="css/SwellStyle.css" rel="stylesheet" type="text/css"></link>
     </head>
     <body></body>
-    <script>
+    <script type="text/javascript">
 
         // no-go stimulus image path
-        var stop_image = 'signals/stop_signal.bmp';
+        var stop_image = 'img/signals/stop_signal.bmp';
         //set up fixation
-        var fixation_image = 'signals/fixpoint.png';
+        var fixation_image = 'img/signals/fixpoint.png';
         //set up feedback images
-        var correct_image = 'signals/correct.bmp'
-        var wrong_image = 'signals/incorrect.bmp'
+        var correct_image = 'img/signals/correct.bmp'
+        var wrong_image = 'img/signals/incorrect.bmp'
         //set up SSD
         var delay = 250;
         //set up trial counts
@@ -39,6 +39,17 @@
         var block3_within_count = 1;
         var block3_go_count = 1;
         var block3_stop_count = 1;
+
+        // set up durations
+        var feedback_duration = 500;
+        var feedback_trial_gap_duration = 1000;
+        var fixation_duration = 500;
+        var IAPS_duration = 1000;
+        var IAPS_gap_duration = 1000;
+        var stopStim_duration = 500;
+        var stopStim_post_trial_gap_duration = 1000;
+        var goStim_duration = 1000;
+        var goStim_post_trial_gap_duration = 500;
 
         // set up block trial data
         var practice_trial_info = practice_info;
@@ -98,8 +109,8 @@
             type: 'html-keyboard-response',
             stimulus: '<h1 style="color:red;">Please respond faster.</h1>',
             choices: jsPsych.NO_KEYS,
-            trial_duration: 500,
-            post_trial_gap: 1000,
+            trial_duration: feedback_duration,
+            post_trial_gap: feedback_trial_gap_duration,
             data: {trial_segment: 'too_slow'}
         }
         var too_slow_conditional = {
@@ -118,8 +129,8 @@
             type: 'image-keyboard-response',
             stimulus: correct_image,
             choices: jsPsych.NO_KEYS,
-            trial_duration: 500,
-            post_trial_gap: 1000,
+            trial_duration: feedback_duration,
+            post_trial_gap: feedback_trial_gap_duration,
             data: {trial_segment: 'practice_correct_go'}
         }
 
@@ -139,8 +150,8 @@
             type: 'image-keyboard-response',
             stimulus: wrong_image,
             choices: jsPsych.NO_KEYS,
-            trial_duration: 500,
-            post_trial_gap: 1000,
+            trial_duration: feedback_duration,
+            post_trial_gap: feedback_trial_gap_duration,
             data: {trial_segment: 'practice_wrong_go'}
         }
 
@@ -160,8 +171,8 @@
             type: 'image-keyboard-response',
             stimulus: correct_image,
             choices: jsPsych.NO_KEYS,
-            trial_duration: 500,
-            post_trial_gap: 1000,
+            trial_duration: feedback_duration,
+            post_trial_gap: feedback_trial_gap_duration,
             data: {trial_segment: 'practice_correct_stop'}
         }
 
@@ -181,8 +192,8 @@
             type: 'image-keyboard-response',
             stimulus: wrong_image,
             choices: jsPsych.NO_KEYS,
-            trial_duration: 500,
-            post_trial_gap: 1000,
+            trial_duration: feedback_duration,
+            post_trial_gap: feedback_trial_gap_duration,
             data: {trial_segment: 'practice_wrong_stop'}
         }
 
@@ -206,7 +217,7 @@
                 type: 'image-keyboard-response',
                 stimulus: fixation_image,
                 choices: jsPsych.NO_KEYS,
-                trial_duration: 500,
+                trial_duration: fixation_duration,
                 data: {trial_segment: 'fixation', condition: practice_trial_info[i].condition}
             }
             timeline.push(fixation);
@@ -215,7 +226,7 @@
                 type: 'image-keyboard-response',
                 stimulus: practice_trial_info[i].emotion_image,
                 choices: jsPsych.NO_KEYS,
-                trial_duration: 1000,
+                trial_duration: IAPS_duration,
                 data: {trial_segment: 'emotion', condition: practice_trial_info[i].condition}
             }
             timeline.push(emotion);
@@ -243,8 +254,8 @@
                     stimulus: stop_image,
                     choices: ['c','n'],
                     response_ends_trial: false,
-                    trial_duration: 1000,
-                    post_trial_gap: 1000,
+                    trial_duration: stopStim_duration,
+                    post_trial_gap: stopStim_post_trial_gap_duration,
                     data: {
                       block: 'practice',
                       trial_absolute: function() {
@@ -320,8 +331,8 @@
                     stimulus: practice_trial_info[i].arrow_image,
                     choices: ['c','n'],
                     response_ends_trial: true,
-                    trial_duration: 1000,
-                    post_trial_gap: 500,
+                    trial_duration: goStim_duration,
+                    post_trial_gap: goStim_post_trial_gap_duration,
                     data: {
                       block: 'practice',
                       trial_absolute: function() {
@@ -394,7 +405,7 @@
                 type: 'image-keyboard-response',
                 stimulus: fixation_image,
                 choices: jsPsych.NO_KEYS,
-                trial_duration: 500,
+                trial_duration: fixation_duration,
                 data: {trial_segment: 'fixation', condition: block1_trial_info[i].condition}
             }
             timeline.push(fixation);
@@ -403,7 +414,7 @@
                 type: 'image-keyboard-response',
                 stimulus: block1_trial_info[i].emotion_image,
                 choices: jsPsych.NO_KEYS,
-                trial_duration: 1000,
+                trial_duration: IAPS_duration,
                 data: {trial_segment: 'emotion', condition: block1_trial_info[i].condition}
             }
             timeline.push(emotion);
@@ -431,8 +442,8 @@
                     stimulus: stop_image,
                     choices: ['c','n'],
                     response_ends_trial: false,
-                    trial_duration: 1000,
-                    post_trial_gap: 1000,
+                    trial_duration: stopStim_duration,
+                    post_trial_gap: stopStim_post_trial_gap_duration,
                     data: {
                       block: 'block1',
                       trial_absolute: function() {
@@ -505,8 +516,8 @@
                     stimulus: block1_trial_info[i].arrow_image,
                     choices: ['c','n'],
                     response_ends_trial: true,
-                    trial_duration: 1000,
-                    post_trial_gap: 500,
+                    trial_duration: goStim_duration,
+                    post_trial_gap: goStim_post_trial_gap_duration,
                     data: {
                       block: 'block1',
                       trial_absolute: function() {
