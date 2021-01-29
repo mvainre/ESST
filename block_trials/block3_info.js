@@ -1,3 +1,4 @@
+// number of trials: 80
 block3 = [
  {
    "emotion_type": "neu",
