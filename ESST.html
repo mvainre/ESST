@@ -3,26 +3,30 @@
 <html>
     <head>
         <title>Emotional stop signal task</title>
-        <script src="jspsych-6.1.0/jspsych.js"></script>
-        <script src="jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js"></script>
-        <script src="jspsych-6.1.0/plugins/jspsych-image-keyboard-response.js"></script>
-        <script src="jspsych-6.1.0/plugins/jspsych-instructions.js"></script>
-        <script src = "block_trials/block1_info.js"></script>
-        <script src = "block_trials/block2_info.js"></script>
-        <script src = "block_trials/block3_info.js"></script>
-        <script src = "block_trials/practice_info.js"></script>
-        <link href="css/SwellStyle.css" rel="stylesheet" type="text/css"></link>
+        <script src="jspsych/jspsych.js"></script>
+        <script src="jspsych/plugins/jspsych-html-keyboard-response.js"></script>
+        <script src="jspsych/plugins/jspsych-image-keyboard-response.js"></script>
+        <script src="jspsych/plugins/jspsych-instructions.js"></script>
+        <script src="jspsych/plugins/jspsych-fullscreen.js"></script>
+        <script src = "jatos.js"></script>
+        <script src = "js/jquery.min.js" type="text/javascript"></script>
+        <script src = "js/block_trials/block1_info.js"></script>
+        <script src = "js/block_trials/block2_info.js"></script>
+        <script src = "js/block_trials/block3_info.js"></script>
+        <script src = "js/block_trials/practice_info.js"></script>
+        <link href="css/SwellStyle_dark.css" rel="stylesheet" type="text/css"></link>
     </head>
-    <body></body>
+    <body style="background-color:black;"></body>
     <script type="text/javascript">
 
+
         // no-go stimulus image path
-        var stop_image = 'img/signals/stop_signal.bmp';
+        var stop_image = 'img/ESST/signals/stop_signal.bmp';
         //set up fixation
-        var fixation_image = 'img/signals/fixpoint.png';
+        var fixation_image = 'img/ESST/signals/fixpoint.png';
         //set up feedback images
-        var correct_image = 'img/signals/correct.bmp'
-        var wrong_image = 'img/signals/incorrect.bmp'
+        var correct_image = 'img/ESST/signals/correct.bmp'
+        var wrong_image = 'img/ESST/signals/incorrect.bmp'
         //set up SSD
         var delay = 250;
         //set up trial counts
@@ -61,6 +65,13 @@
         //set up timeline
         var timeline = [];
 
+
+        // make the experiment to be fullscreen to avoid distractions
+        timeline.push({
+          type: 'fullscreen',
+          fullscreen_mode: true
+        });
+
         // see docs for more info on the instructions plugin: https://www.jspsych.org/plugins/jspsych-instructions/
         var welcome = {
             type: "html-keyboard-response",
@@ -72,7 +83,7 @@
         var instructions1 = {
             type: 'instructions',
             pages: ["<h1>Get settled in for the next 20 minutes</h1>" +
-                "<p>Make sure you're <b>sitting comfortably</b>.<br><br><h1>&#x1F515</h1>Shield yourself from <b>distractions</b>: <br>&#x1F4F4 <b>mute</b> your phone and <br>&#x1F4E9 e-mail alerts </p>" +
+                "<p>Make sure you're <b>sitting comfortably</b>.<br><br><h1>&#x1F515</h1><p>Shield yourself from <b>distractions</b>: <br>&#x1F4F4 <b>mute</b> your phone and <br>&#x1F4E9 e-mail alerts </p>" +
 
                 "<h2><br>Ready? Press space to continue</h2>"],
             key_forward: 32, // code for space
@@ -90,7 +101,7 @@
                 "<h2><br>Press space to continue</h2>",
                 "<h1>&#x2B06</h1>"+
                 "<p>Sometimes, the left/right arrow will be followed by an <b>arrow pointing upwards</b>.</p>" +
-                "<p>When this happens <br>&#x1F6AB<b>YOU MUST NOT RESPOND</b>&#x1F6AB</p>" +
+                "<p>When this happens</p><h4>&#x1F6AB YOU MUST NOT RESPOND</b>&#x1F6AB</h4><p>no matter if the arrow before was pointing to the left or to the right</p>" +
                 "<h2><br>Press space to continue</h2>",
                 "<h1>&#x23F1</h1>"+
                 "<h2>Try to be <b>as quick as possible</b> in your responses</h2>"+
@@ -107,7 +118,7 @@
         // set up feedback and conditions for practice trials
         var too_slow_message = {
             type: 'html-keyboard-response',
-            stimulus: '<h1 style="color:red;">Please respond faster.</h1>',
+            stimulus: '<h1 style="color:#ef476f;">Please respond faster</h1>',
             choices: jsPsych.NO_KEYS,
             trial_duration: feedback_duration,
             post_trial_gap: feedback_trial_gap_duration,
@@ -209,6 +220,41 @@
             }
         }
 
+        // Gets triggered when no keyboard response has made for the last 3 trials where response is needed. The trial is paused and will continue when space is pressed.
+        var instructions_break1 = {
+            type: 'instructions',
+            pages: ["<h1>Need a break?</h1>" +
+                "<p>Have a good stretch if so.</p>" +
+                "<h2><br>Press space when you're ready to continue</h2>"],
+            key_forward: 32, // code for space
+            show_clickable_nav: false
+        };
+
+        var display_haveabreak_message_conditional = {
+            timeline: [instructions_break1],
+            conditional_function: function() {
+                if (trial_absolute_count > 10) {
+                var trial_totalmisses = jsPsych.data.get().filter({trial_segment: 'target', key_press: null}).count(); // this is just to test the function in console. It has no functionality for the function and can be deleted.
+                var trial_last3matches = jsPsych.data.get().filter({trial_segment: 'target'}).last(3); // count the last 3 trials that are matches (ie where keypress is needed):
+                var trial_last3matches_misses = trial_last3matches.filter({key_press: null}).count(); // count the number of times where there were no keypress (a proxy that the participant may not be paying attention);
+                console.log('trials misses ' + trial_totalmisses + ' out of ' + trial_absolute_count + ' trials. Number of trials missed in the last 3: ' + trial_last3matches_misses);
+                if (trial_last3matches_misses  == 4) { // gets triggered if missed at least 3 trials
+                  display_haveabreak_message = true;
+                  console.log('Should I have a break? I have missed many trials: ' + trial_last3matches_misses);
+                  return true;
+                } else {
+                  display_haveabreak_message = false;
+                  console.log('No need for a break! Only missed few trials: ' + trial_last3matches_misses);
+                  return false;
+                }
+                } else {
+                console.log('trial number not yet 12. Current one: ' + trial_absolute_count);
+                return false;
+                }
+              },
+        };
+
+
         //set up practice block
         for (var i=0; i<practice_trial_info.length; i++) {
             // add fixation to this trial
@@ -248,6 +294,7 @@
                     }
                 }
                 timeline.push(target_arrow);
+
                 // set up stop signal and add to this trial
                 var stop_signal = {
                     type: 'image-keyboard-response',
@@ -385,11 +432,11 @@
         // set up instructions post practice
         var post_practice_instructions = {
             type: 'instructions',
-            pages: ["<h1>&#x1F4A1<br>Nice!</h1><p>By now, you probably have an idea how this works. <br>If you have any questions, contact the researcher. <br>If you feel ready, please continue.</p>" +
+            pages: ["<h1>&#x1F4A1<br>Nice!</h1><p>Now you probably have an idea how this works." +
                 "<p>From now on there will be no feedback on your performance.</p>" +
                 "<h2>Press space to continue</h2>",
                 "<h1>&#x1F514<br>A quick reminder</h1>" +
-                "<p>Press the C-key when you see the left arrow. <br>Press the N-key when you see the right arrow.<br>Stop if the up arrow appers. </p>" +
+                "<p>Press the C-key when you see the left arrow. <br>Press the N-key when you see the right arrow.<br><b>Stop and don't press anything</b>  if the up arrow appers. </p>" +
                 "<h2>Ready? Press space to start</h2>",
               ],
               key_forward: 32, // code for space
@@ -436,6 +483,7 @@
                     }
                 }
                 timeline.push(target_arrow);
+
                 // set up stop signal and add to this trial
                 var stop_signal = {
                     type: 'image-keyboard-response',
@@ -560,6 +608,7 @@
                     }
                 };
                 timeline.push(target_arrow);
+                timeline.push(display_haveabreak_message_conditional);
             }
         }
 
@@ -613,6 +662,7 @@
                     }
                 }
                 timeline.push(target_arrow);
+
                 // set up stop signal and add to this trial
                 var stop_signal = {
                     type: 'image-keyboard-response',
@@ -737,6 +787,7 @@
                     }
                 };
                 timeline.push(target_arrow);
+                timeline.push(display_haveabreak_message_conditional);
                 // add the too slow conditional node (go trials only)
             }
         }
@@ -791,6 +842,7 @@
                     }
                 }
                 timeline.push(target_arrow);
+
                 // set up stop signal and add to this trial
                 var stop_signal = {
                     type: 'image-keyboard-response',
@@ -915,6 +967,7 @@
                     }
                 };
                 timeline.push(target_arrow);
+                timeline.push(display_haveabreak_message_conditional);
             }
         }
 
@@ -925,15 +978,27 @@
             trial_duration: 5000
         };
 
-        jsPsych.init({
-            timeline: timeline,
-            on_finish: function(data) {
-                // see docs for info on data formatting and saving:
-                // https://www.jspsych.org/core_library/jspsych-data/#csv
-                // https://www.jspsych.org/core_library/jspsych-data/#json
-                // https://www.jspsych.org/core_library/jspsych-data/#localsave
-                jsPsych.data.get().localSave("csv","go_stop_data.csv");
-            }
+        jatos.onLoad(function() {
+
+          jsPsych.data.addProperties({
+            jatos_study_ID: jatos.studyId,
+            jatos_component_ID: jatos.componentId,
+            jatos_component_result_ID: jatos.componentResultId,
+            jatos_worker_ID: jatos.workerId,
+            jatos_study_result_ID: jatos.studyResultId,
+          });
+
+
+          jsPsych.init({
+              timeline: timeline,
+              show_progress_bar: true,
+              show_preload_progress_bar: true, //hide preload progress bar
+              on_finish: function() {
+                  // jsPsych.data.displayData();
+                  var result_json = jsPsych.data.get().json() + jsPsych.data.getInteractionData().json(); // This added on part after the + is to send browser interactions to JATOS in addition to trial data
+                  jatos.submitResultData(result_json, jatos.startNextComponent);
+              }
+          });
         });
 
     </script>
