@@ -1,3 +1,4 @@
+// number of trials: 8
 var practice_info = [
   {
     "emotion_type": "neg",
